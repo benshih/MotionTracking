@@ -12,8 +12,8 @@ function [ u, v ] = LucasKanade( It, It1, rect )
     x2 = rect(3);
     y2 = rect(4);
     
+    template = It(x1:x2, y1:y2);
     
-
 
 end
 
