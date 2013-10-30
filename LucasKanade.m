@@ -4,6 +4,10 @@
 % 10/22/2013
 % 1.2 Lucas-Kanade
 
+
+% convert images from rgb2gray and im2double before using, otherwise
+% interp2 gets angry
+
 function [ u, v ] = LucasKanade( It, It1, rect )
     % Top left corner
     x1 = rect(1);
@@ -14,24 +18,22 @@ function [ u, v ] = LucasKanade( It, It1, rect )
     [Itx, Ity, ~] = size(It); % same size as It1
     
     [X, Y] = meshgrid(1:Itx, 1:Ity);
-    X = im2double(X');
-    Y = im2double(Y');
     [Xq, Yq] = meshgrid(x1:x2, y1:y2);
     % These values represent the interpolated intensities corresponding to
     % values in the Xq, Yq meshgrid.
-    Vqt = interp2(X, Y, It, Xq, Yq);
-    Vqt1 = interp2(X, Y, It1, Xq, Yq);
+    Vqt = interp2(X, Y, It', Xq, Yq);
+    Vqt1 = interp2(X, Y, It1', Xq, Yq);
  
     % Make large matrix.
-    [ix, iy] = gradient(Vqt);
+    [ix, iy] = gradient(Vqt1); % q: should this be on t or t+1?
     deltaI = Vqt(:) - Vqt1(:);
     A = [ix(:) iy(:)];
     
     % Compute the optimized solution for the minimization.
     a = (A'*A)^-1*A'*deltaI;
     
-    u = a(1);
-    v = a(2);
+    u = a(1)
+    v = a(2)
 end
 
 
