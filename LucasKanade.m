@@ -42,7 +42,7 @@ function [u,v] = LucasKanade(It,It1,rect)
     %     Yq1 = (Y1)+p(2);
     %     [Xq, Yq] = meshgrid(Xq1,Yq1);
     %     ItWarp = interp2(It1,Xq,Yq);
-    %     
+         
         ItWarp = warpImg(It1, rect, p);
 
         % Find the difference between the warped image and the template. 
@@ -53,10 +53,10 @@ function [u,v] = LucasKanade(It,It1,rect)
         % Warp the gradients. step 3
     %     dxWarp = interp2(dX,Xq,Yq); 
     %     dyWarp = interp2(dY,Xq,Yq);
-        dxWarp = warpImg(dX, rect, p);
-        dyWarp = warpImg(dY, rect, p);
-        dxWarp = dxWarp(:);
-        dyWarp = dyWarp(:);
+%         dxWarp = warpImg(dX, rect, p);
+%         dyWarp = warpImg(dY, rect, p);
+%         dxWarp = dxWarp(:);
+%         dyWarp = dyWarp(:);
 
         % Steepest descent images. step 5
         warpedGrad = double([dX(:), dY(:)]);
