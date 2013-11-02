@@ -7,9 +7,9 @@
 clc
 close all
 
-load('carSequence.mat')
+load('bookSequence.mat')
 
-rect=[328 213 419 265];
+rect=[247 102 285 161];
 [m,n,channels,frames] = size(sequence);
 
 width = abs(rect(1)-rect(3));
@@ -27,12 +27,14 @@ for i=1:frames-1
     
     Itcurr = rgb2gray(im2double(sequence(:,:,:,i)));
     Itnext = rgb2gray(im2double(sequence(:,:,:,i+1)));
-    [u,v] = LucasKanade(Itcurr,Itnext,rect);
+    [u,v] = LucasKanadeBasis(Itcurr,Itnext,rect,basis);
     rect=[rect(1)+u rect(2)+v rect(3)+u rect(4)+v];
     coordinates(i,:) = rect;
     %disp(['Frame ',num2str(i)]);
     
     rect = round(coordinates(i,:));
 end
+
+
 
 close

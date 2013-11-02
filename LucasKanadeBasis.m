@@ -8,15 +8,13 @@
 % convert images from rgb2gray and im2double before using, otherwise
 % interp2 gets angry
 
-function [u,v] = LucasKanade(It,It1,rect)
+function [u,v] = LucasKanadeBasis(It,It1,rect,basis)
     % Initialising u,v for motion estimate. 
     u = 0;
     v = 0;
-    % Initialising u1,v1 which are updates for u,v in each iteration
-    u1 = 0;
-    v1 = 0;
+    w = zeros(size(basis));
     count = 0;
-
+    
     % Meshgrid for X,Y for the entire range of image
 %     [X,Y]=meshgrid(1:size(It,2),1:size(It,1));
     
@@ -32,8 +30,11 @@ function [u,v] = LucasKanade(It,It1,rect)
     [dX, dY] = gradient(double(template));
 %     template = template(y,x);
 
+    numPix = numel(basis{1});
+    vectorBasis = zeros(numPix, length(basis));
+
     while((count < 50))
-        p=[u v];
+        p=[u v w];
         count = count + 1;
 
         % Map pixels in template to pixels in It1
@@ -59,7 +60,11 @@ function [u,v] = LucasKanade(It,It1,rect)
 %         dyWarp = dyWarp(:);
 
         % Steepest descent images. step 5
-        warpedGrad = double([dX(:), dY(:)]);
+        for iBasisIdx = 1:length(basis)
+            currBasis = basis{iBasisIdx};
+            vectorBasis(:,iBasisIdx) = currBasis(:);
+        end
+        warpedGrad = double([dX(:), dY(:), vectorBasis]);
 
         % Compute the optimized solution for the minimization.
         % step 6, 7, 8
@@ -68,6 +73,7 @@ function [u,v] = LucasKanade(It,It1,rect)
         % step 9
         u = p(1) + deltaP(1);
         v = p(2) + deltaP(2);
+        w = deltaP(3:10)';
 
         if (norm(deltaP) < 0.01)
             continue
@@ -86,40 +92,3 @@ function [warpedImg] = warpImg(img, rect, p)
 %     img = double(img);
     warpedImg = interp2(img,X,Y);
 end
-
-
-% algorithm flow chart: http://www.cse.psu.edu/~rcollins/CSE598G/LKintroContinued.pdf
-% 
-%     while (p > epsilon)
-%         % 1. Warp It.
-%         tform = affine2d([1 0 warp(1); 0 1 warp(2); 0 0 1]);
-%         Itwarp = imwarp(Itnext, tform);
-%         
-%         % 2. Compute the error image T(x) - I(W(x;p))
-%         template = Itcurr(x1:x2, y1:y2);
-%         It_template = Itwarp(x1:x2, y1:y2);
-%         
-%         % 3. Warp the gradient with W(x;p)
-%         [ix iy] = gradient(Itwarp);
-%         ixNew = imwarp(ix, tform);
-%         iyNew = imwarp(iy, tform);
-%         
-%         % 4. Evaluate the Jacobian at (x; p). In this case it's the identity
-%         % matrix because we only have a transform. How to genralize this?
-%         jacob = eye(2);
-%         
-%         % 5. Compute the steepest descent images.
-%         ixSteep = ixNew * jacob;
-%         iySteep = iyNew * jacob;
-%         
-%         % 6. Compute the Hessian matrix.
-%         steepJacob = [ixSteep; iySteep];
-%         
-%         % 7. Compute the sum_x(gradientI*jacobian)'*(T(x) - I(W(x;p))).
-%         
-%         
-%         % 8. Compute change in parameters.
-%         
-%         
-%         % 9. Update the parameters.
-%     end
