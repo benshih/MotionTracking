@@ -20,7 +20,7 @@ function [moving_image] = SubtractDominantMotion(image1, image2)
     % hysteresis threshold can then be declared as corresponding to
     % locations of moving objects.
     deltaI = abs(deltaI)/255;
-    moving_image = medfilt2(hysthresh(deltaI, 0.3, 0.2));
+    moving_image = medfilt2(hysthresh(deltaI, 0.23, 0.19));
     se = strel('disk', 8);
     
     % Any algorithm of my choice for estimating the moving_image following
